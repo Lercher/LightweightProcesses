@@ -5,7 +5,31 @@ Module Module1
     Private n As Integer = 0
     Private nn As Integer = 0
 
-    Sub Main()
+    Sub Main
+        Dim sv = New Supervisor
+        Dim con = New Connector(Of String)
+
+        ' consumer
+        sv.Spawn(con, 
+            Sub(s)
+                Console.WriteLine("Received {0}", s)
+                If Integer.Parse(s) > 5 Then con.Close
+            End Sub)
+
+        ' Producer
+        sv.Spawn(con, 0,
+            Function(i, post)
+                post(i.ToString)
+                If i > 10 Then con.Close
+                Return i + 1
+            End Function)
+
+        sv.Join
+        con.CheckSaldo
+        Console.ReadLine
+    End Sub
+
+    Sub MainCinnector()
         Dim con = New Connector(Of String)
 
         Dim producerwait = 1000
@@ -26,7 +50,7 @@ Module Module1
                 Console.WriteLine("Receive loop ended. Closing Connector.")
                 con.Close()
             End Function)
-        
+
 
         dim producer = Task.Run(
             Async Function()

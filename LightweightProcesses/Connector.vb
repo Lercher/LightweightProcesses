@@ -21,11 +21,11 @@ Public Class Connector(Of M As Class)
                     SyncLock Me
                         con = New Connection
                     End SyncLock
-                    Console.WriteLine("Setresult Task ID {0}", thiscon.rcv.Task.Id)
+                    'Console.WriteLine("Setresult Task ID {0}", thiscon.rcv.Task.Id)
                     thiscon.rcv.SetResult(msg)
                 End Sub
             )
-            Console.WriteLine("Receive await Task ID {0}", thiscon.rcv.Task.Id)
+            'Console.WriteLine("Receive await Task ID {0}", thiscon.rcv.Task.Id)
             Return thiscon.rcv.Task
         End SyncLock
     End Function

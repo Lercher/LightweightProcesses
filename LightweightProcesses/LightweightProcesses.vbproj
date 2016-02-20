@@ -78,6 +78,7 @@
     <Compile Include="IConsumeMessages.vb" />
     <Compile Include="IProduceMessages.vb" />
     <Compile Include="Lightweight\ListenerProcess.vb" />
+    <Compile Include="Lightweight\TalkerProcess.vb" />
     <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
