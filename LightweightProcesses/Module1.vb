@@ -6,6 +6,56 @@ Module Module1
     Private nn As Integer = 0
 
     Sub Main()
+        Dim con = New Connector(Of String)
+
+        Dim producerwait = 1000
+        Dim consumerwait = 100
+
+        dim consumer = Task.Run(
+            Async Function()
+                For i = 0 To 400
+                    Thread.Sleep(consumerwait)
+                    Console.WriteLine("{0:n0}. Await Receive", i)
+                    Dim s = Await con.Receive()
+                    If s Is Nothing Then
+                        Console.WriteLine("Receive returned null.")
+                        Exit for
+                    End If
+                    Console.WriteLine("{0:n0}. Received {0}", i, s)
+                Next
+                Console.WriteLine("Receive loop ended. Closing Connector.")
+                con.Close()
+            End Function)
+        
+
+        dim producer = Task.Run(
+            Async Function()
+                For i = 0 To 4
+                    Console.WriteLine("{0:n0}. Await Post", i)
+                    Dim pst = Await con.Post()
+                    If pst Is Nothing Then
+                        Console.WriteLine("Post returned null.")
+                        Exit For
+                    End If
+                    Thread.Sleep(producerwait)
+                    Console.WriteLine("{0:n0}. Posting {0}", i)
+                    pst(i.ToString)
+                Next
+                Console.WriteLine("Post loop ended. Closing Connector.")
+                con.Close
+            End Function)
+
+
+
+        Task.WaitAll(consumer, producer)
+        Console.WriteLine("Both tasks ended. Checking saldo ...")
+        con.CheckSaldo()
+
+        Console.Write("Press Return ... ")
+        Console.ReadLine
+    End Sub
+
+    Sub MainChannel()
         Dim sv = New Supervisor
         Dim ch(0 To 9999) as Channel(Of String)
 

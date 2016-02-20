@@ -66,6 +66,7 @@ Public Class Channel(Of M As Class)
         InternalPost(Nothing)
     End Sub
 
+    <Conditional("DEBUG")>
     Public Sub CheckSaldo
         Dim nn = Threading.Interlocked.Increment(n)
         If nn = 0 Then Return
