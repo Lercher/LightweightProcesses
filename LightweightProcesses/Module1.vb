@@ -14,6 +14,7 @@ Module Module1
         sv.Spawn(con2, 
             Sub(s)
                 Console.WriteLine("Received {0}", s)
+                Thread.Sleep(250)
             End Sub)
 
         ' Transformer
