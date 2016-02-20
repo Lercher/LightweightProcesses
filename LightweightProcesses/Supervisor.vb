@@ -7,23 +7,37 @@
 Public Class Supervisor
     Private processes As New HashSet(Of Lightweight.Process)
 
-    Public Sub Spawn(of M As Class)(Producer As IProduceMessages(Of M), Processor As Action(Of M))
-        Dim proc As Lightweight.Process = New Lightweight.ListenerProcess(Of M) With {.Processor = Processor, .Producer = Producer}
+    Public Overloads Sub Spawn(of M As Class)(producer As IProduceMessages(Of M), processor As Action(Of M))
+        Dim proc As Lightweight.Process = New Lightweight.ListenerProcess(Of M) With {.Processor = processor, .Producer = producer}
         SyncLock processes
             processes.Add(proc)
         End SyncLock
         Dim handler =
             Async Function()
                 Do
-                    Dim msg = Await Producer.Receive()
+                    Dim msg = Await producer.Receive()
                     If msg Is Nothing Then Exit do
-                    Processor(msg)
+                    processor(msg)
                 Loop
                 SyncLock processes
                     processes.Remove(proc)
                 End SyncLock
             End Function
         proc.t = Task.Run(handler)
+    End Sub
+
+    Public Overloads Sub Spawn(of M As Class, S)(initialstate As S, sourceOfMs As Func(Of S, Action(Of M), Task(of S)), consumer As IConsumeMessages(Of M))
+        Dim handler = 
+            Async Function()
+                Dim current = initialstate
+                Do
+                    Dim ch = Await consumer.Post()
+                    If ch Is Nothing Then Exit Do
+                    current = Await sourceOfMs(current, ch)
+                Loop
+            End Function
+        Task.Run(handler)
+        ' TODO: record Lightweight.Process
     End Sub
 
     Public Sub Join
