@@ -5,17 +5,17 @@
 ''' Processes should communicate only via <see cref="Channel(Of M)"/> instances.
 ''' </summary>
 Public Class Supervisor
-    Private processes As New HashSet(Of LightweightProcess)
+    Private processes As New HashSet(Of Lightweight.Process)
 
-    Public Sub Spawn(of M As Class)(ch As IProduceMessages(Of M), Processor As Action(Of M))
-        Dim proc As LightweightProcess = New LightweightProcess(Of M) With {.Processor = Processor, .Channel = ch}
+    Public Sub Spawn(of M As Class)(Producer As IProduceMessages(Of M), Processor As Action(Of M))
+        Dim proc As Lightweight.Process = New Lightweight.ListenerProcess(Of M) With {.Processor = Processor, .Producer = Producer}
         SyncLock processes
             processes.Add(proc)
         End SyncLock
         Dim handler =
             Async Function()
                 Do
-                    Dim msg = Await ch.Receive()
+                    Dim msg = Await Producer.Receive()
                     If msg Is Nothing Then Exit do
                     Processor(msg)
                 Loop
@@ -35,14 +35,5 @@ Public Class Supervisor
         Console.WriteLine("Joining {0:n0} processes", ar.Length)
         Task.WaitAll(ar)
     End Sub
-
-    Public MustInherit Class LightweightProcess
-        Public t As Task
-    End Class
-
-    Public Class LightweightProcess(Of M As Class)
-        Inherits LightweightProcess
-        Public Property Processor As Action(Of M)
-        Public Property Channel As IProduceMessages(Of M)
-    End Class
 End Class
+
