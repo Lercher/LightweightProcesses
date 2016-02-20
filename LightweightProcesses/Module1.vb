@@ -7,25 +7,29 @@ Module Module1
 
     Sub Main
         Dim sv = New Supervisor
-        Dim con = New Connector(Of String)
+        Dim con1 = New Connector(Of String)
+        Dim con2 = New Connector(Of String)
 
-        ' consumer
-        sv.Spawn(con, 
+        ' Consumer
+        sv.Spawn(con2, 
             Sub(s)
                 Console.WriteLine("Received {0}", s)
-                If Integer.Parse(s) > 5 Then con.Close
             End Sub)
 
+        ' Transformer
+        sv.Spawn(con1, con2, Function(s1) s1 & "+" & s1)
+
         ' Producer
-        sv.Spawn(con, 0,
+        sv.Spawn(con1, 0,
             Function(i, post)
                 post(i.ToString)
-                If i > 10 Then con.Close
+                If i > 10 Then con1.Close
                 Return i + 1
             End Function)
 
         sv.Join
-        con.CheckSaldo
+        con1.CheckSaldo
+        con2.CheckSaldo
         Console.ReadLine
     End Sub
 

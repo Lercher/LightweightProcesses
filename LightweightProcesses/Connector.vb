@@ -1,6 +1,7 @@
 ﻿Imports LightweightProcesses
 
 Public Class Connector(Of M As Class)
+    Implements IDisposable
     Implements IProduceMessages(Of M)
     Implements IConsumeMessages(Of M)
 
@@ -37,7 +38,7 @@ Public Class Connector(Of M As Class)
         End SyncLock
     End Function
 
-    Public Sub Close()
+    Public Sub Close() Implements IDisposable.Dispose
         SyncLock Me
             closing = True
             If Not con.rcv.Task.IsCompleted Then con.rcv.SetResult(Nothing)
