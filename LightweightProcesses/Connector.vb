@@ -1,9 +1,13 @@
-﻿Public Class Connector(Of M As Class)
+﻿Imports LightweightProcesses
+
+Public Class Connector(Of M As Class)
+    Implements IReceiveMessages(Of M)
+
     Private con As New Connection
     Private closing As Boolean = False
     Private n As Integer = 0
 
-    Public Function Receive() As Task(Of M)
+    Public Function Receive() As Task(Of M) Implements IReceiveMessages(Of M).Receive
         Threading.Interlocked.Decrement(n)
         SyncLock Me
             If closing Then Return Task.FromResult(Of M)(Nothing)
