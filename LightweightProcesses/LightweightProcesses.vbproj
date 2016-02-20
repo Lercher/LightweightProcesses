@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Channel.vb" />
     <Compile Include="Connector.vb" />
+    <Compile Include="IConsumeMessages.vb" />
     <Compile Include="IProduceMessages.vb" />
     <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

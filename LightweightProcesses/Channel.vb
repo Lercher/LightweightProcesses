@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.Concurrent
+Imports LightweightProcesses
 ''' <summary>
 ''' Lightweight one-way async pipe.
 ''' </summary>
@@ -9,6 +10,7 @@
 ''' </remarks>
 Public Class Channel(Of M As Class)
     Implements IProduceMessages(Of M)
+    Implements IConsumeMessages(Of M)
     Implements IDisposable
     Private q As New Queue(Of M)(capacity:=0)
     Private receivedHead As TaskCompletionSource(Of M)
@@ -60,6 +62,10 @@ Public Class Channel(Of M As Class)
         InternalPost(msg)
     End Sub
 
+    Public Function Post() As Task(Of Action(Of M)) Implements IConsumeMessages(Of M).Post
+        Return Task.FromResult(Of Action(Of M))(AddressOf Post)
+    End Function
+
     ''' <summary>
     ''' close the chanel so that the receiver process <see cref="Supervisor"/> terminates
     ''' </summary>
@@ -73,4 +79,5 @@ Public Class Channel(Of M As Class)
         If nn = 0 Then Return
         Console.WriteLine("Saldo {0:n0}", nn)
     End Sub
+
 End Class

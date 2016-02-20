@@ -2,6 +2,7 @@
 
 Public Class Connector(Of M As Class)
     Implements IProduceMessages(Of M)
+    Implements IConsumeMessages(Of M)
 
     Private con As New Connection
     Private closing As Boolean = False
@@ -29,7 +30,7 @@ Public Class Connector(Of M As Class)
         End SyncLock
     End Function
 
-    Public Function Post() As Task(Of Action(Of M))
+    Public Function Post() As Task(Of Action(Of M)) Implements IConsumeMessages(Of M).Post
         SyncLock Me
             If closing Then Return Task.FromResult(Of Action(Of M))(Nothing)
             Return con.pst.Task
