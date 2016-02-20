@@ -8,7 +8,7 @@
 ''' See https://github.com/dotnet/corefx/blob/master/src/System.Threading.Tasks.Dataflow/src/Blocks/BufferBlock.cs for an alternative
 ''' </remarks>
 Public Class Channel(Of M As Class)
-    Implements IReceiveMessages(Of M)
+    Implements IProduceMessages(Of M)
     Implements IDisposable
     Private q As New Queue(Of M)(capacity:=0)
     Private receivedHead As TaskCompletionSource(Of M)
@@ -19,7 +19,7 @@ Public Class Channel(Of M As Class)
     ''' await a result of <typeparamref name="M"/>
     ''' </summary>
     ''' <returns>a message or null if the channel was explicitly closed with <see cref="Close()"/></returns>
-    Public Function Receive() As Task(Of M) Implements IReceiveMessages(Of M).Receive
+    Public Function Receive() As Task(Of M) Implements IProduceMessages(Of M).Receive
         Threading.Interlocked.Decrement(n)
         SyncLock q
             If receivedHead Is Nothing OrElse receivedHead.Task.IsCompleted Then

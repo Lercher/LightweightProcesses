@@ -7,7 +7,7 @@
 Public Class Supervisor
     Private processes As New HashSet(Of LightweightProcess)
 
-    Public Sub Spawn(of M As Class)(ch As IReceiveMessages(Of M), Processor As Action(Of M))
+    Public Sub Spawn(of M As Class)(ch As IProduceMessages(Of M), Processor As Action(Of M))
         Dim proc As LightweightProcess = New LightweightProcess(Of M) With {.Processor = Processor, .Channel = ch}
         SyncLock processes
             processes.Add(proc)
@@ -43,6 +43,6 @@ Public Class Supervisor
     Public Class LightweightProcess(Of M As Class)
         Inherits LightweightProcess
         Public Property Processor As Action(Of M)
-        Public Property Channel As IReceiveMessages(Of M)
+        Public Property Channel As IProduceMessages(Of M)
     End Class
 End Class
