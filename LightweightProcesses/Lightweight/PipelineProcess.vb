@@ -1,5 +1,5 @@
 Namespace Lightweight
-    Public Class Pipeline(Of M1 As Class, M2 As Class)
+    Public Class PipelineProcess(Of M1 As Class, M2 As Class)
         Inherits Process
 
         Public Property Producer As IProduceMessages(Of M1)

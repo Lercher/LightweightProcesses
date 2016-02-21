@@ -6,19 +6,69 @@ Module Module1
     Private nn As Integer = 0
 
     Sub Main
+        MainCallable
+        MainConnector
+        MainBasicConnector
+        MainChannel
+    End Sub
+
+    Sub MainCallable
+        Dim sv = New Supervisor
+        Dim con = New Connector(Of String, String)
+
+        ' Caller
+        Dim t = Task.Run(
+            Async Function()
+                For i = 0 To 9
+                    Dim retCon = New Connector(Of String)
+                    Console.WriteLine("await Call {0}", i)
+                    Await con.Call(retCon, i.ToString)
+                    Console.WriteLine("Await Receive {0}", i)
+                    Dim ret = Await retCon.Receive()
+                    Console.WriteLine("Result={0}", ret)
+                Next
+                ' shorter with extension method:
+                For i = 100 To 109
+                    Dim ret = Await con.Invoke(i.ToString)
+                    Console.WriteLine("Result={0}", ret)
+                next
+            End function)
+
+        Thread.Sleep(250)
+
+        ' Worker
+        sv.Spawn(con,
+            Function(s)
+                ' Note that this function gets called *after* the call to Receive() on the return channel.
+                Dim ret = s & "+" & s
+                Console.WriteLine("Converting {0} to {1}.", s, ret)
+                Return ret
+            End Function)
+
+        Task.WaitAll(t)
+        con.Close
+        sv.Join
+        con.CheckSaldo
+        Console.ReadLine
+    End Sub
+
+    Sub MainConnector
         Dim sv = New Supervisor
         Dim con1 = New Connector(Of String)
         Dim con2 = New Connector(Of String)
 
         ' Consumer
-        sv.Spawn(con2, 
+        sv.Spawn(con2,
             Sub(s)
                 Console.WriteLine("Received {0}", s)
                 Thread.Sleep(250)
             End Sub)
 
         ' Transformer
-        sv.Spawn(con1, con2, Function(s1) s1 & "+" & s1)
+        sv.Spawn(con1, con2,
+            Function(s1)
+                Return s1 & "+" & s1
+            End Function)
 
         ' Producer
         sv.Spawn(con1, 0,
@@ -34,7 +84,7 @@ Module Module1
         Console.ReadLine
     End Sub
 
-    Sub MainCinnector()
+    Sub MainBasicConnector()
         Dim con = New Connector(Of String)
 
         Dim producerwait = 1000
