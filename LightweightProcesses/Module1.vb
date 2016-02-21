@@ -6,10 +6,10 @@ Module Module1
     Private nn As Integer = 0
 
     Sub Main
+        MainChannel
         MainCallable
         MainConnector
         MainBasicConnector
-        MainChannel
     End Sub
 
     Sub MainCallable

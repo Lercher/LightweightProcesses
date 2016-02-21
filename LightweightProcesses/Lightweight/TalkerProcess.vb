@@ -1,5 +1,5 @@
 Namespace Lightweight
-    Public Class TalkerProcess(Of M As Class, S)
+    Friend Class TalkerProcess(Of M As Class, S)
         Inherits Process
 
         Public Property Consumer As IConsumeMessages(Of M)
